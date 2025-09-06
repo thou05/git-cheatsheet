@@ -17,7 +17,7 @@ ssh-keygen -t ed25519 -C "example@email.com"
 	- `git add .` : add tất cả file đã thay đổi
 	- `git add src/` : add toàn bộ folder
 
-![[git-add.png]]
+![git-add.png](https://github.com/thou05/git-cheatsheet/blob/main/img/git-add.png)
 
 ### `git commit`
 - chuyển tất cả thay đổi từ staging area -> local repository
