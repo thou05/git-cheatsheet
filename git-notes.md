@@ -81,7 +81,7 @@ ssh-keygen -t ed25519 -C "example@email.com"
 	- `git remote remove remote_name`: xóa remote
 
 ### `git push`
-![[git-push.png]]
+![git-push.png](https://github.com/thou05/git-cheatsheet/blob/main/img/git-push.png)
 
 - đưa các commit từ local repo lên remote repo
 - ngoài ra
@@ -113,7 +113,7 @@ ssh-keygen -t ed25519 -C "example@email.com"
 - ⚠️ Tên branch ở local và remote liên kết với nhau nên trùng tên cho dễ quản lý
 
 ### `git pull` và `git fetch`
-![[pull-fetch.png]]
+![pull-fetch.png](https://github.com/thou05/git-cheatsheet/blob/main/img/pull-fetch.png)
 
 - git pull = git fetch + git merge
 
@@ -207,7 +207,7 @@ ssh-keygen -t ed25519 -C "example@email.com"
 		- đứng ở nhánh main
 		- `git merge dev`
 - `fast-forward merge`
-	![[fast-forward-merge.png]]
+	- ![fast-forward-merge.png](https://github.com/thou05/git-cheatsheet/blob/main/img/fast-forward-merge.png)
 	- nhánh ban đầu ko có commit mới từ khi tạo branch mới từ nhánh ban đầu
 	- branch mới phát triển tuyến tính từ nhánh ban đầu
 	- đặc điểm
@@ -216,7 +216,8 @@ ssh-keygen -t ed25519 -C "example@email.com"
 		- lịch sử commit tuyến tính
 
 - `Three-way merge`
-	![[3-way-merge.png]]
+	- ![3-way-merge.png](https://github.com/thou05/git-cheatsheet/blob/main/img/3-way-merge.png)
+
 	- nhánh ban đầu có commits mới từ khi tạo new-branch
 	- đặc điểm
 		- tạo commit mới (merge commit)
@@ -276,7 +277,7 @@ ssh-keygen -t ed25519 -C "example@email.com"
 	- kết hợp `git status` để hiểu đầy đủ trạng thái
 - dấu `--` giúp git phân biệt rõ ràng giữa branch/commit names và file paths, đặc biệt quan trọng khi tên file trùng với tên branch
 
-![[git-diff.png]]
+![](img/git-diff.png)
 
 ## Going back and undoing changes
 - khi nào cần going back
@@ -309,6 +310,238 @@ ssh-keygen -t ed25519 -C "example@email.com"
 		- HEAD~n : n là số commit trước commit hiện tại
 -  ⚠️  `git restore` không undo được => nên thực hiện tạm lưu thay đổi trước khi thực hiện `git restore` bằng `git stash` 
 
+
+### `git reset`
+- chức năng chính
+	- xóa commit khỏi history
+	- reset branch về commit cũ
+	- di chuyển HEAD về vị trí mong muốn
+- command
+	- `git reset <commit_hash>`
+	- `git reset HEAD~n` : quay lại n commit trước
+- hay gặp
+	- tạo branch mới
+	- chưa chuyển sang branch mới
+	- đã thay đổi file rồi commit
+- các option quan trọng
+	- `git reset <commit_hash>` : mặc định là `mixed`
+	-  `git reset <commit_hash> --mixed`: giữ nguyên file đang sửa và bỏ git add
+	-  `git reset <commit_hash> --soft`: giữ nguyên staged và working directory
+	-  `git reset <commit_hash> --hard` : mọi thay đổi bị xóa sạch
+
+- ưu điểm
+	- dọn dẹp history gọn gàng
+	- có thể quay lại nhiều commit
+	- linh hoạt giữ hoặc xóa file
+- nhược
+	- phá vỡ commit history
+	- commit bị mất vĩnh viễn
+	- khó merge branch
+	- nguy hiểm với shared repo
+
+- reset cục bộ, sẽ ko ảnh hưởng đến remote cho đến khi push, và thường phải `--force` mới push thành công
+- có thể thực hiện backup bằng cách tạo branch mới trước khi chạy git reset
+
+### `git revert`
+- ưu điểm
+	- tạo commit mới để hoàn tác
+	- giữ nguyên history cũ
+	- an toàn với shared repo
+- `revert`: làm ngược lại, nếu commit A -> B , thì revert B sẽ tạo commit C có state như A
+	
+	![](git-revert.png)
+
+- `git revert <commit_hash>`
+	- `git revert HEAD`: revert commit cuối cùng
+	- `git revert <commit_hash>`: revert commit cụ thể
+	- `git revert HEAD~1`: revert commit thứ 2 từ commit cuối cùng
+
+### git checkout and git detached head
+- git checkout là gì
+	- đa chức năng: có nhiều tính năng, dễ nhầm lẫn
+	- chuyển đổi giữa các version khác nhau của target
+	- hoạt động trên 3 thực thể: file, commit, branch
+- để tránh nhầm lẫn, nên
+	- `git switch` cho chuyển đổi branch
+	- `git checkout` cho checkout commit
+	- `git restore` cho phục hồi file
+
+- checkout đến commit cụ thể
+	- xem lại nội dung trong commit cũ
+	- không phải undo hay xóa commit
+	- tương tự "time travel" - quay lại xem quá khứ
+- command: `git checkout <commit_hash>`
+- sau khi thực hiện checkout về commit
+	- HEAD ko gắn với branch nào
+	- đang ở trạng thái `detached HEAD`
+- ý nghĩa `detached HEAD`
+	- HEAD ko gắn với branch nào
+	- thay đổi sẽ ko được lưu khi chuyển branch
+	- commit mới có thể bị mất nếu ko tạo branch
+
+- nên sau khi checkout xong: `git switch -c <new branch name>`
+
+## Advances
+### `git ignore`
+- tình huống thực tế
+	- khi `git push` -> update remote repository
+	- nhưng có file ko muốn push
+		- thư mục build
+		- ide setting, cache file
+		- log file, temporary file...
+- `.gitignore`: file đặc biệt giúp git bỏ qua (ignore) những file/folder ko cần track
+
+```
+project/
+		.git/
+		.gitignore  <- đặt ở đây (root level)
+		src/
+		README.md
+```
+- file cấu hình `.gitignore` đặt ở root level của git repo
+- liệt kê file/folder mà git sẽ bỏ qua
+- không track những file được liệt kê
+
+- ignore toàn bộ foler
+	```bash
+	#ignore folder (có đầu cuối)
+	hehe/
+	
+	#ignore foler (ko có đầu cuối)
+	hehe
+	```
+
+- ignore file theo extension
+	```bash
+	#ignore tất cả file có extension 
+	*.xy
+	*.log
+	*.tmp
+	*.cache
+	```
+
+- wildcard và pattern
+	- `*` : match bấ kì kí tự nào
+	- `**`: match nested directory
+	- `!`: negate pattern (ko ignore)
+	- `/`: root directory
+	```bash
+	#ignore tát cả file .txt trong bất kì thư mục nào
+	**/*.txt
+	
+	#ignore chỉ .txt ở root level
+	/*.txt
+	
+	#ignore tất cả folder nhưng giữ folder
+	logs/*
+	!logs/.gitkeep
+	
+	#ignore file bắt đầu bằng test
+	test*
+	
+	#ignore file kết thúc bằng .dev
+	*.dev
+	```
+	- chú ý
+		- `#` dùng để comment trong file `.gitignore` 
+		- git sử dụng forward slash `/` cho dường dẫn trong `.gitignore` 
+
+### `git tags`
+- là gì
+	- git tags = "nhãn" gắn vào commit cụ thể
+	- đánh dấu mốc quan trọng trong lịch sử dự án
+	- thường dùng cho phiên bản phát hành (releases)
+	
+	 -> dễ nhớ, dễ quản lý, dễ tìm kiếm
+
+- nhược điểm
+	- cần discipline: maintain naming convention
+	- conflict potential: nhiều ng tạo tags cùng tên
+
+- các loại git tags
+	- lightweight tags: `git tag v1.0.0`
+		- chỉ là pointer đến commit
+		- ko chứa metadata
+	- annotated tags: `git tag -a v1.0.0 -m "Release version 1.0.0`
+		- chứa thông tin đầy đủ (author, date, message)
+		- recommended cho releases
+
+- commands
+	- tạo tags
+		- cho commit hiện tại
+			- `git tag v1.0.0`
+			- `git tag -a v1.0.0 -m "Release 1.0.0`
+		- cho commit cũ
+			- `git tag v0.9.0 <commit_hash>`
+			- `git tag -a v0.9.0 <commit_hash> -m "version 0.9.0`
+	- xóa tag: `git tag -d v1.0.0`
+	- checkout về tag: `git checkout v1.0.0`
+	- xem danh sách tag: `git tag`
+	- push tag lên remote: `git push origin v1.0.0`
+
+- chú ý: tương tự commit, khi checkout về tag và thực hiện dev trên đó -> cần tạo branch mới và chuyển sang đó, tránh thay đổi bị mất
+
+### `git stash`
+- thực tế: khi đang làm việc dở trên 1 branch và muốn chuyển sang branch khác (vd sửa bug gấp), nhưng ko muốn commit những thay đổi chưa hoàn thành
+- khi nào nên dùng
+	- đang chỉnh sửa dở, chưa sẵng sàng để commit
+	- cần chuyển sang nhánh khác để làm việc khác
+	- muốm làm điều đó mà ko mất các thay đổi đang có
+
+- command
+	- `git stash`: lưu tạm thời các thay đổi chưa commit
+	- `git stash list`: liệt kê các stash đang lưu
+	- `git stash apply`: áp dụng lại stash mới nhất (hoặc chỉ định stash cụ thể)
+	- `git stash drop`: xóa stash cụ thể
+	- `git stash pop`: áp dụng và xóa stash khỏi danh sách
+	- `git stash clear`: xóa toàn bộ các stash
+
+- VD flow làm việc
+	- `git branch dev`
+	- `git switch dev`
+	- thay đổi 1 số file, lúc này cần quay lại main chỉnh sửa gấp
+	- vẫn ở dev: `git stash`
+	- quay về main sửa: `git switch main` -> commit
+	- quay lại dev: `git switch dev`
+	- lấy lại những thay đổi đang dang dở: `git stash apply`
+	- tiếp tục làm việc trên dev rồi commit
+
+### `git rebase`
+
+| `git merge`                                       | `git rebase`                                                   |
+| ------------------------------------------------- | -------------------------------------------------------------- |
+| - giữ nguyên thứ tự commit theo thời gian thực tế | - 'di chuyển' các commit của nhánh hiện tại lên đầu nhánh đích |
+| - tạo merge commit khi kết hợp nhánh              | - tạo lịch sử commit tuyến tính, dễ đọc                        |
+| - lịch sử commit phức tạp, khó theo dõi           | - dễ theo dõi để review code hơn                               |
+
+- lợi ích chính
+	- lịch sử commit sạch sẽ, tuyến tính
+	- dễ dành review từng commit
+	- ko tạo merge commit ko cần thiết
+
+![](git-rebase.png)
+
+### `git hook`
+- `git hook` là các script tự động được git chạy ở các thời điểm nhất định (trc/sau commit, push, merge...)
+- giúp kiểm tra, tự động hóa và kiểm soát quy trình git
+- các hook được đặt trong thư mục `.git/hooks`
+- mỗi hook là 1 file script (bash or executable script) và phải có quyền thực thi
+- một số hook phổ biến
+	- `pre-commit`: chạy trc khi commit
+	- `commit-msg`: kiểm tra nội dung message commit
+	- `post-commit`: chạy sau khi commit xong
+
+- lợi ích
+	- giúp tự động hóa kiểm tra chất lượng code or nội dung
+	- ko cần cài thêm công cụ ngoài git
+	- có thể chia sẻ cho team bằng cách copy vào repo (`chưa ok`)
+	
+- `git hook` mặc định là script shell (bash)
+
+- chỉ tồn tại ở local repo và ko đc đồng bộ qua git (tức ko đc commit, push lên github/gitlab cùng các file khác trong repo)
+	- thư mục `.git/` ko bao giờ được đồng bộ qua git
+	- mỗi dev phải tự cài hooks trên máy mình
+	- nếu team muốn dùng chung hooks, phải copy thủ công hoặc dùng các công cụ khác
 
 -----
 ## References

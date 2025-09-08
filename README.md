@@ -16,4 +16,15 @@
 - `git merge <branch-name>`
 -  `git diff --staged`
 
+## Going back and undoing changes
+- `git restore filename`
+- `git reset <commit_hash>`
+- `git revert <commit_hash>`
+
+## Advances
+- `git ignore`
+-  `git tags`
+- `git stash`
+- `git rebase`
+- `git hook`
 
