@@ -349,7 +349,7 @@ ssh-keygen -t ed25519 -C "example@email.com"
 	- an toàn với shared repo
 - `revert`: làm ngược lại, nếu commit A -> B , thì revert B sẽ tạo commit C có state như A
 	
-	![](git-revert.png)
+	![](img/git-revert.png)
 
 - `git revert <commit_hash>`
 	- `git revert HEAD`: revert commit cuối cùng
@@ -519,7 +519,7 @@ project/
 	- dễ dành review từng commit
 	- ko tạo merge commit ko cần thiết
 
-![](git-rebase.png)
+![](img/git-rebase.png)
 
 ### `git hook`
 - `git hook` là các script tự động được git chạy ở các thời điểm nhất định (trc/sau commit, push, merge...)
